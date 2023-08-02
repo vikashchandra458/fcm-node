@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You</title>
+    <style>
+        .thanks {
+            margin: 8rem auto;
+            width: 30rem;
+            color: #343434;
+            font-family: Lato, sans-serif;
+        }
+
+        .checkmark {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: block;
+            stroke-width: 6;
+            stroke: #fff;
+            stroke-miterlimit: 10;
+            margin: 1rem auto;
+            box-shadow: inset 0px 0px 0px #7ac142;
+            animation: fill .4s ease-in-out .9s forwards, scale .3s ease-in-out 1.4s both;
+        }
+
+        .checkmark__circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: #7ac142;
+            fill: none;
+            animation: stroke .6s cubic-bezier(0.650, 0.000, 0.450, 1.000) .5s forwards;
+        }
+
+        .checkmark__check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            animation: stroke .3s cubic-bezier(0.650, 0.000, 0.450, 1.000) 1.3s forwards;
+        }
+
+        .thanks__title {
+            margin-bottom: .5rem;
+            font-size: 1.375rem;
+            font-weight: 700;
+            line-height: 1.2;
+            text-align: center;
+
+            animation: fadein 1s cubic-bezier(.31, .39, 1, .31);
+        }
+
+        .line-wrap {
+            position: relative;
+            height: 1rem;
+            margin-bottom: .5rem;
+        }
+
+        .line {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            border-bottom: solid 2px #979797;
+            border-top-width: 0px;
+            animation: line .6s cubic-bezier(.44, .72, .96, .42) forwards;
+        }
+
+        .thanks__cta {
+            text-align: center;
+
+            animation: fadein 1s cubic-bezier(.31, .39, 1, .31);
+        }
+
+        @keyframes line {
+            from {
+                left: 50%;
+                width: 0%;
+            }
+
+            to {
+                left: 15%;
+                width: 70%;
+            }
+        }
+
+        @keyframes fadein {
+            0% {
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes stroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes scale {
+
+            0%,
+            100% {
+                transform: none;
+            }
+
+            50% {
+                transform: scale3d(1.1, 1.1, 1);
+            }
+        }
+
+        @keyframes fill {
+            100% {
+                box-shadow: inset 0px 0px 0px 30px #7ac142;
+            }
+        }
+
+        a {
+            color: #EA5C26
+        }
+    </style>
+</head>
+
+<body>
+    <div class="thanks">
+
+        <div class="thanks__title">
+            Something went wrong. <br />
+            Please close this page
+        </div>
+        <div class="line-wrap">
+            <div class="line"></div>
+        </div>
+    </div>
+</body>
+
+</html>
