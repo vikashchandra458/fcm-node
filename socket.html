@@ -1,39 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Socket.IO Location Updates</title>
-</head>
-<body>
-    <h1>Socket.IO Location Updates</h1>
-    <ul id="locationUpdates">
-        <!-- Location updates will be displayed here -->
-    </ul>
-
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io(); // Connect to the Socket.IO server
-        const locationUpdatesList = document.getElementById('locationUpdates');
-
-        // Function to add a new location update to the list
-        function addLocationUpdate(latitude, longitude) {
-            const listItem = document.createElement('li');
-            listItem.textContent = `Latitude: ${latitude}, Longitude: ${longitude}`;
-            locationUpdatesList.appendChild(listItem);
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
         }
 
-        // Listen for 'locationUpdates' event and display existing location updates
-        socket.on('locationUpdates', (locationUpdates) => {
-            locationUpdates.forEach((update) => {
-                addLocationUpdate(update.latitude, update.longitude);
-            });
-        });
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+        }
 
-        // Listen for 'locationUpdate' event and add it to the list
-        socket.on('locationUpdate', (data) => {
-            addLocationUpdate(data.latitude, data.longitude);
+        h1 {
+            font-size: 28px;
+            background: linear-gradient(45deg, #ff9900, #ff3300);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .location-update p {
+            margin: 0;
+            padding: 0;
+            font-size: 18px;
+            background:
+                /* Linear Gradient (Light Blue to Dark Blue) */
+                linear-gradient(45deg, #0099cc, #0033cc),
+                /* Green Texture Background Image */
+                url('green-texture.jpg');
+            /* Replace 'green-texture.jpg' with your texture image */
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Socket.IO Location Updates</h1>
+    </header>
+    <div class="container">
+        <ul class="location-updates" id="locationUpdates">
+            <!-- Location updates will be displayed here -->
+        </ul>
+        <button id="clearListButton">Clear List</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script> <!-- Include Socket.IO library -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const socket = io(); // Connect to the Socket.IO server
+            const locationUpdatesList = document.getElementById('locationUpdates');
+            const clearListButton = document.getElementById('clearListButton');
+
+            // Function to add a new location update to the list
+            function addLocationUpdate(latitude, longitude, ip) {
+                if (latitude !== undefined && longitude !== undefined) {
+                    const locationUpdateLi = document.createElement('li');
+                    locationUpdateLi.className = 'location-update';
+                    locationUpdateLi.innerHTML = `<div style="display: flex; justify-content: space-between;">
+                        <p><strong>Location:</strong> </p>
+                        <p> Latitude: ${latitude} </p>
+                        <p> Longitude: ${longitude}</p>
+                        <p>   IP: ${ip}</p>
+                    </div>`;
+                    locationUpdatesList.appendChild(locationUpdateLi);
+                }
+            }
+
+            // Function to clear the list of location updates
+            function clearLocationUpdates() {
+                locationUpdatesList.innerHTML = '';
+            }
+
+            // Function to display device connection/disconnection messages
+            function deviceConnectDisconnect(message) {
+                const locationUpdateLi = document.createElement('li');
+                locationUpdateLi.className = 'location-update';
+                locationUpdateLi.textContent = message;
+                locationUpdatesList.appendChild(locationUpdateLi);
+            }
+
+            // Listen for 'locationUpdates' event and display existing location updates
+            socket.on('locationUpdates', (locationUpdates) => {
+                locationUpdates.forEach((update) => {
+                    addLocationUpdate(update.latitude, update.longitude, update.ip);
+                });
+            });
+
+            // Listen for 'locationUpdate' event and add it to the list
+            socket.on('locationUpdate', (data) => {
+                addLocationUpdate(data.latitude, data.longitude, data.ip);
+            });
+
+            // Listen for 'deviceConnected' and 'deviceDisconnected' events
+            socket.on('deviceConnected', (data) => {
+                deviceConnectDisconnect(data.message);
+            });
+
+            socket.on('deviceDisconnected', (data) => {
+                deviceConnectDisconnect(data.message);
+            });
+
+            // Clear the list when the button is clicked
+            clearListButton.addEventListener('click', clearLocationUpdates);
         });
     </script>
 </body>
+
 </html>

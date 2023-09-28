@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Create an HTTP server
-const server = http.createServer(app); // Pass 'app' to the server
+const server = http.createServer(app);
 
 // Create a Socket.IO server by passing the HTTP server
 const io = new Server(server);
@@ -23,43 +23,52 @@ const locationUpdates = [];
 
 // Event handler when a client connects
 io.on('connection', (socket) => {
-  console.log('A client connected');
-  locationUpdates.push('A client connected');
+  console.log(JSON.stringify(`A client connected from client at IP   ${socket.handshake.address.includes('ffff') ? socket.handshake.address.replace('ffff:', '  ') : socket.handshake.address}`));
+
+  // Emit a 'deviceConnected' event to inform all connected clients
+  io.emit('deviceConnected', { message: `A client connected from client at IP   ${socket.handshake.address.includes('ffff') ? socket.handshake.address.replace('ffff:', '  ') : socket.handshake.address}` });
 
   // Send existing location updates to the newly connected client
   socket.emit('locationUpdates', locationUpdates);
 
   // Handle custom events from the client
   socket.on('locationUpdate', (data) => {
-    console.log('Received location update from client at IP:', socket.handshake.address);
-    console.log('Latitude:', data.latitude);
-    console.log('Longitude:', data.longitude);
+    if (data?.latitude && data?.longitude) {
+      console.log('Latitude:', data.latitude,socket.handshake.address);
+      console.log('Longitude:', data.longitude);
 
-    // Save the location update including the client's IP
-    const locationUpdate = {
-      ...data,
-      clientIP: socket.handshake.address,
-    };
-    locationUpdates.push(locationUpdate);
+      // Save the location update including the client's IP
+      const update = {
+        ...data,
+        clientIP: socket.handshake.address,
+      };
 
-    // // Broadcast the location update to all connected clients
-    // io.emit('locationUpdate', locationUpdate);
+      locationUpdates.push(update);
+
+      // Broadcast the location update to all connected clients
+      io.emit('locationUpdate', update);
+    }
   });
-
 
   // Function to clear location updates
   function clearLocationUpdates() {
-    locationUpdates = [];
+    locationUpdates.length = 0; // Clear the array
+    setMessage();
+  }
+
+  function setMessage() {
     locationUpdates.push('Location updates cleared.');
   }
 
   // Event handler when a client disconnects
   socket.on('disconnect', () => {
-    console.log('A client disconnected');
-    locationUpdates.push('A client disconnected from client at IP:', socket.handshake.address);
+    console.log(JSON.stringify(`A client disconnected from client at IP   ${socket.handshake.address.includes('ffff') ? socket.handshake.address.replace('ffff:', '  ') : socket.handshake.address}`));
+
+    // Emit a 'deviceDisconnected' event to inform all connected clients
+    io.emit('deviceDisconnected', { message: `A client disconnected from client at IP   ${socket.handshake.address.includes('ffff') ? socket.handshake.address.replace('ffff:', '  ') : socket.handshake.address}` });
+
     setTimeout(clearLocationUpdates, 60000);
   });
-
 });
 
 app.get("/", async function (req, res) {
