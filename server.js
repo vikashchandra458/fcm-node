@@ -4,7 +4,7 @@ const app = express();
 const http = require('http');
 const path = require("path");
 const cors = require('cors');
-const admin = require("../firebase-config");
+const admin = require("./firebase-config");
 const { Server } = require('socket.io');
 
 app.use(bodyParser.json());
