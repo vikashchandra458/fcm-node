@@ -4,7 +4,7 @@ const app = express();
 const http = require('http');
 const path = require("path");
 const cors = require('cors');
-const admin = require("./firebase-config");
+const admin = require("./firebase-config"); // Make sure Firebase Admin is correctly initialized in "firebase-config.js"
 const { Server } = require('socket.io');
 
 app.use(bodyParser.json());
@@ -12,12 +12,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 // Create an HTTP server
-const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Socket.IO server is running');
-});
+const server = http.createServer(app); // Pass 'app' to the server
 
 // Create a Socket.IO server by passing the HTTP server
 const io = new Server(server);
@@ -53,13 +49,12 @@ io.on('connection', (socket) => {
 
 app.get("/", async function (req, res) {
   try {
-      res.sendFile(path.join(__dirname, "socket.html")); // Updated filename
+    res.sendFile(path.join(__dirname, "socket.html"));
   } catch (error) {
-      console.error("Error serving socket.html:", error);
-      res.status(500).send("Internal Server Error");
+    console.error("Error serving socket.html:", error);
+    res.status(500).send("Internal Server Error");
   }
 });
-
 
 app.post("/", async function (req, res) {
   var payload = {
