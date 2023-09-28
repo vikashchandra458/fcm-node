@@ -20,13 +20,24 @@ const server = http.createServer((req, res) => {
 // Create a Socket.IO server by passing the HTTP server
 const io = new Server(server);
 
+// Create an array to store location updates
+const locationUpdates = [];
+
 // Event handler when a client connects
 io.on('connection', (socket) => {
   console.log('A client connected');
 
+  // Send existing location updates to the newly connected client
+  socket.emit('locationUpdates', locationUpdates);
+
   // Handle custom events from the client
   socket.on('locationUpdate', (data) => {
-    console.log('Received location update:', data);
+    console.log('Received location update:');
+    console.log('Latitude:', data.latitude);
+    console.log('Longitude:', data.longitude);
+
+    // Save the location update
+    locationUpdates.push(data);
 
     // Broadcast the location update to all connected clients
     io.emit('locationUpdate', data);
@@ -39,8 +50,8 @@ io.on('connection', (socket) => {
 });
 
 app.get("/", async function (req, res) {
-  res.sendFile(path.join(__dirname, "form.html"));
-});
+    res.sendFile(path.join(__dirname, "socket.html")); // Updated filename
+  });
 
 app.post("/", async function (req, res) {
   var payload = {
@@ -51,7 +62,11 @@ app.post("/", async function (req, res) {
   };
   admin.messaging().sendToDevice(req?.body?.token, payload)
     .then(function (response) {
-      console.log("Successfully sent message:", response.results[0].messageId);
+      console.log("Successfully sent message:");
+      response.results.forEach((result, index) => {
+        console.log(`Result ${index}:`, result.messageId);
+      });
+
       if (response.results[0].messageId) {
         res.sendFile(path.join(__dirname, "thankyou.html"));
       } else {
