@@ -24,26 +24,34 @@ const locationUpdates = [];
 // Event handler when a client connects
 io.on('connection', (socket) => {
   console.log('A client connected');
+  locationUpdates.push('A client connected');
 
   // Send existing location updates to the newly connected client
   socket.emit('locationUpdates', locationUpdates);
 
   // Handle custom events from the client
   socket.on('locationUpdate', (data) => {
-    console.log('Received location update:');
+    console.log('Received location update from client at IP:', socket.handshake.address);
     console.log('Latitude:', data.latitude);
     console.log('Longitude:', data.longitude);
 
-    // Save the location update
-    locationUpdates.push(data);
+    // Save the location update including the client's IP
+    const locationUpdate = {
+      ...data,
+      clientIP: socket.handshake.address,
+    };
+    locationUpdates.push(locationUpdate);
 
-    // Broadcast the location update to all connected clients
-    io.emit('locationUpdate', data);
+    // // Broadcast the location update to all connected clients
+    // io.emit('locationUpdate', locationUpdate);
   });
+
 
   // Event handler when a client disconnects
   socket.on('disconnect', () => {
     console.log('A client disconnected');
+    locationUpdates.push('A client disconnected from client at IP:', socket.handshake.address);
+    locationUpdates = [];
   });
 });
 
