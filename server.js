@@ -47,12 +47,19 @@ io.on('connection', (socket) => {
   });
 
 
+  // Function to clear location updates
+  function clearLocationUpdates() {
+    locationUpdates = [];
+    locationUpdates.push('Location updates cleared.');
+  }
+
   // Event handler when a client disconnects
   socket.on('disconnect', () => {
     console.log('A client disconnected');
     locationUpdates.push('A client disconnected from client at IP:', socket.handshake.address);
-    locationUpdates = [];
+    setTimeout(clearLocationUpdates, 60000);
   });
+
 });
 
 app.get("/", async function (req, res) {
