@@ -98,6 +98,7 @@
                         <p>   IP: ${ip}</p>
                     </div>`;
                     locationUpdatesList.appendChild(locationUpdateLi);
+                    locationUpdatesList.scrollTop = locationUpdatesList.scrollHeight;
                 }
             }
 
@@ -128,7 +129,12 @@
 
             // Listen for 'deviceConnected' and 'deviceDisconnected' events
             socket.on('deviceConnected', (data) => {
-                deviceConnectDisconnect(data.message);
+                if (data.message === 'Clear') {
+                    clearLocationUpdates
+                }
+                else {
+                    deviceConnectDisconnect(data.message);
+                }
             });
 
             socket.on('deviceDisconnected', (data) => {
