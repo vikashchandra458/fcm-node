@@ -53,7 +53,7 @@ io.on('connection', (socket) => {
   // Function to clear location updates
   function clearLocationUpdates() {
     locationUpdates.length = 0; // Clear the array
-    io.emit('deviceDisconnected', { message: 'Clear' });
+    io.emit('clear', { message: 'Clear' });
     setTimeout(setMessage, 2000);
   }
 

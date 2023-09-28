@@ -129,16 +129,15 @@
 
             // Listen for 'deviceConnected' and 'deviceDisconnected' events
             socket.on('deviceConnected', (data) => {
-                if (data.message === 'Clear') {
-                    clearLocationUpdates
-                }
-                else {
-                    deviceConnectDisconnect(data.message);
-                }
+                deviceConnectDisconnect(data.message);
             });
 
             socket.on('deviceDisconnected', (data) => {
                 deviceConnectDisconnect(data.message);
+            });
+
+            socket.on('clear', (data) => {
+                clearLocationUpdates()
             });
 
             // Clear the list when the button is clicked
