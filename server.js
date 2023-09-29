@@ -60,6 +60,15 @@ io.on('connection', (socket) => {
   function setMessage() {
     // io.emit('deviceDisconnected', { message: 'Location updates cleared.' });
   }
+  socket.on('error', (msg) => {
+    console.log(JSON.stringify('Unable to get location'));
+
+    // Emit a 'deviceDisconnected' event to inform all connected clients
+    io.emit('deviceDisconnected', { message: 'Unable to get location' });
+    // io.emit('deviceDisconnected', { message: `Location status will be cleared in 60 seconds` });
+
+    // setTimeout(clearLocationUpdates, 60000);
+  });
 
   // Event handler when a client disconnects
   socket.on('disconnect', () => {
