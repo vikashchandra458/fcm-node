@@ -53,12 +53,12 @@ io.on('connection', (socket) => {
   // Function to clear location updates
   function clearLocationUpdates() {
     locationUpdates.length = 0; // Clear the array
-    io.emit('clear', { message: 'Clear' });
-    setTimeout(setMessage, 2000);
+    // io.emit('clear', { message: 'Clear' });
+    // setTimeout(setMessage, 2000);
   }
 
   function setMessage() {
-    io.emit('deviceDisconnected', { message: 'Location updates cleared.' });
+    // io.emit('deviceDisconnected', { message: 'Location updates cleared.' });
   }
 
   // Event handler when a client disconnects
@@ -67,9 +67,9 @@ io.on('connection', (socket) => {
 
     // Emit a 'deviceDisconnected' event to inform all connected clients
     io.emit('deviceDisconnected', { message: `A client disconnected from client at IP   ${socket.handshake.address.includes('ffff') ? socket.handshake.address.replace('ffff:', '  ') : socket.handshake.address}` });
-    io.emit('deviceDisconnected', { message: `Location status will be cleared in 60 seconds` });
+    // io.emit('deviceDisconnected', { message: `Location status will be cleared in 60 seconds` });
 
-    setTimeout(clearLocationUpdates, 60000);
+    // setTimeout(clearLocationUpdates, 60000);
   });
 });
 
