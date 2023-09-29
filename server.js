@@ -27,14 +27,14 @@ io.on('connection', (socket) => {
 
   // Emit a 'deviceConnected' event to inform all connected clients
   io.emit('deviceConnected', { message: `A client connected from client at IP   ${socket.handshake.address.includes('ffff') ? socket.handshake.address.replace('ffff:', '  ') : socket.handshake.address}` });
-
+  console.log(JSON.stringify("Socket : ",socket.handshake))
   // Send existing location updates to the newly connected client
   socket.emit('locationUpdates', locationUpdates);
 
   // Handle custom events from the client
   socket.on('locationUpdate', (data) => {
     if (data?.latitude && data?.longitude) {
-      console.log('Latitude:', data.latitude,socket.handshake.address);
+      console.log('Latitude:', data.latitude, socket.handshake.address);
       console.log('Longitude:', data.longitude);
 
       // Save the location update including the client's IP
