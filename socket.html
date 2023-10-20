@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.IO Location Updates</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+        crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.4.0/mdb.min.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        h1 {
+            font-size: 28px;
+            background: linear-gradient(45deg, #ff9900, #ff3300);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .location-update p {
+            margin: 0;
+            padding: 0;
+            font-size: 18px;
+            background:
+                /* Linear Gradient (Light Blue to Dark Blue) */
+                linear-gradient(45deg, #0099cc, #0033cc),
+                /* Green Texture Background Image */
+                url('green-texture.jpg');
+            /* Replace 'green-texture.jpg' with your texture image */
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg" style="background-color: white; padding-left: 10px; padding-right: 10px">
+        <a class="navbar-brand" href="#">Navbar</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown"
+                        aria-expanded="false">
+                        Dropdown
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">Action</a>
+                        <a class="dropdown-item" href="#">Another action</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/upload-image">Upload-Image</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/finpay">FinPay</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/socket">Socket.io</a>
+                </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" />
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+                    Search
+                </button>
+            </form>
+        </div>
+    </nav>
+    <header>
+        <h1>Socket.IO Location Updates</h1>
+    </header>
+    <div class="container">
+        <ul class="location-updates" id="locationUpdates">
+            <!-- Location updates will be displayed here -->
+        </ul>
+        <button id="clearListButton">Clear List</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script> <!-- Include Socket.IO library -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const socket = io(); // Connect to the Socket.IO server
+            const locationUpdatesList = document.getElementById('locationUpdates');
+            const clearListButton = document.getElementById('clearListButton');
+
+            // Function to add a new location update to the list
+            function addLocationUpdate(latitude, longitude, ip) {
+                if (latitude !== undefined && longitude !== undefined) {
+                    const locationUpdateLi = document.createElement('li');
+                    locationUpdateLi.className = 'location-update';
+                    locationUpdateLi.innerHTML = `<div style="display: flex; justify-content: space-between;">
+                        <p><strong>Location:</strong> </p>
+                        <p> Latitude: ${latitude} </p>
+                        <p> Longitude: ${longitude}</p>
+                        <p>   IP: ${ip}</p>
+                    </div>`;
+                    locationUpdatesList.appendChild(locationUpdateLi);
+                    locationUpdatesList.scrollTop = locationUpdatesList.scrollHeight;
+                }
+            }
+
+            // Function to clear the list of location updates
+            function clearLocationUpdates() {
+                locationUpdatesList.innerHTML = '';
+            }
+
+            // Function to display device connection/disconnection messages
+            function deviceConnectDisconnect(message) {
+                const locationUpdateLi = document.createElement('li');
+                locationUpdateLi.className = 'location-update';
+                locationUpdateLi.textContent = message;
+                locationUpdatesList.appendChild(locationUpdateLi);
+            }
+
+            // Listen for 'locationUpdates' event and display existing location updates
+            socket.on('locationUpdates', (locationUpdates) => {
+                locationUpdates.forEach((update) => {
+                    addLocationUpdate(update.latitude, update.longitude, update.ip);
+                });
+            });
+
+            // Listen for 'locationUpdate' event and add it to the list
+            socket.on('locationUpdate', (data) => {
+                addLocationUpdate(data.latitude, data.longitude, data.ip);
+            });
+
+            // Listen for 'deviceConnected' and 'deviceDisconnected' events
+            socket.on('deviceConnected', (data) => {
+                deviceConnectDisconnect(data.message);
+            });
+
+            socket.on('deviceDisconnected', (data) => {
+                deviceConnectDisconnect(data.message);
+            });
+
+            socket.on('clear', (data) => {
+                clearLocationUpdates()
+            });
+
+            // Clear the list when the button is clicked
+            clearListButton.addEventListener('click', clearLocationUpdates);
+        });
+    </script>
+</body>
+
+</html>
